@@ -92,6 +92,6 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error", { err });
 });
 
-app.listen(2000, () => {
-  console.log("Serving on port 2000");
+app.listen(3000, () => {
+  console.log("Serving on port 3000");
 });
