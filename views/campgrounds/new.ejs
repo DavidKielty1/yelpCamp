@@ -31,7 +31,24 @@
         />
         <div class="valid-feedback">Looks Good!</div>
       </div>
-      <input type="file" name="image" id="" multiple />
+
+      <!-- <div class="input-group">
+        <input
+          type="file"
+          class="form-control"
+          id="image"
+          name="image"
+          multiple
+        />
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          id="imageButton"
+        >
+          Upload
+        </button> -->
+      <!-- </div> -->
+      <!-- <input type="file" name="image" id="" multiple /> -->
       <!-- <div class="mb-3">
         <label class="form-label" for="image">Image Url </label>
         <input
@@ -63,13 +80,23 @@
             name="campground[price]"
             type="text"
             id="price"
-            class="form-control"
+            class="form-control mb-3"
             aria-label="Price"
             aria-describedby="basic-addon1"
             placeholder="0.00"
             required
           />
           <div class="valid-feedback">Looks Good!</div>
+          <div class="input-group mb-3 mt-3 custom-file">
+            <input
+              type="file"
+              class="form-control custom-file-label"
+              placeholder="Choose Files"
+              id="image"
+              name="image"
+              multiple
+            />
+          </div>
         </div>
       </div>
       <button class="btn btn-success mt-3 mb-3">Add Campground</button>
