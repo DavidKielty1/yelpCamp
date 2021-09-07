@@ -16,6 +16,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
+const mongoSanitize = require("express-mongo-sanitize");
 
 const userRoutes = require("./Routes/users");
 const campgroundRoutes = require("./Routes/campgrounds");
@@ -43,13 +44,16 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(mongoSanitize());
 
 const sessionConfig = {
+  name: "session",
   secret: "thisisnotagoodsecret",
   resave: false,
   saveUninitialized: true,
   cookie: {
     httpOnly: true,
+    // secure: true,
     expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
     maxAge: 1000 * 60 * 60 * 24 * 7,
   },
@@ -66,16 +70,11 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+  console.log(req.query);
   res.locals.currentUser = req.user;
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   next();
-});
-
-app.get("/fakeUser", async (req, res) => {
-  const user = new User({ email: "colttt@gmail.com", username: "colttt" });
-  const newUser = await User.register(user, "chicken");
-  res.send(newUser);
 });
 
 app.use("/", userRoutes);
