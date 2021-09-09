@@ -2,6 +2,8 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
+// require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
@@ -16,8 +18,8 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
+const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
-
 const userRoutes = require("./Routes/users");
 const campgroundRoutes = require("./Routes/campgrounds");
 const reviewRoutes = require("./Routes/reviews");
@@ -61,6 +63,51 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 app.use(flash());
+app.use(helmet());
+
+// const scriptSrcUrls = [
+//   "https://stackpath.bootstrapcdn.com/",
+//   "https://api.tiles.mapbox.com/",
+//   "https://api.mapbox.com/",
+//   "https://kit.fontawesome.com/",
+//   "https://cdnjs.cloudflare.com/",
+//   "https://cdn.jsdelivr.net",
+// ];
+// const styleSrcUrls = [
+//   "https://kit-free.fontawesome.com/",
+//   "https://stackpath.bootstrapcdn.com/",
+//   "https://api.mapbox.com/",
+//   "https://api.tiles.mapbox.com/",
+//   "https://fonts.googleapis.com/",
+//   "https://use.fontawesome.com/",
+// ];
+// const connectSrcUrls = [
+//   "https://api.mapbox.com/",
+//   "https://a.tiles.mapbox.com/",
+//   "https://b.tiles.mapbox.com/",
+//   "https://events.mapbox.com/",
+// ];
+// const fontSrcUrls = [];
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: [],
+//       connectSrc: ["'self'", ...connectSrcUrls],
+//       scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+//       styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+//       workerSrc: ["'self'", "blob:"],
+//       objectSrc: [],
+//       imgSrc: [
+//         "'self'",
+//         "blob:",
+//         "data:",
+//         "https://res.cloudinary.com/dg0it3ba2/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT!
+//         "https://images.unsplash.com/",
+//       ],
+//       fontSrc: ["'self'", ...fontSrcUrls],
+//     },
+//   })
+// );
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -70,7 +117,6 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-  console.log(req.query);
   res.locals.currentUser = req.user;
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
@@ -82,7 +128,7 @@ app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
-  res.render("campgrounds/home");
+  res.render("home");
 });
 
 app.all("*", (req, res, next) => {
