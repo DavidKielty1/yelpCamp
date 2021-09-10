@@ -23,7 +23,9 @@ const mongoSanitize = require("express-mongo-sanitize");
 const userRoutes = require("./Routes/users");
 const campgroundRoutes = require("./Routes/campgrounds");
 const reviewRoutes = require("./Routes/reviews");
+// const dbUrl = process.env.DB_URL;
 
+// "mongodb://localhost:27017/yelp-camp"
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
   useNewUrlParser: true,
   useCreateIndex: true,
@@ -63,7 +65,7 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 app.use(flash());
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 
 // const scriptSrcUrls = [
 //   "https://stackpath.bootstrapcdn.com/",
@@ -128,7 +130,7 @@ app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
-  res.render("home");
+  res.render("campgrounds/home");
 });
 
 app.all("*", (req, res, next) => {
