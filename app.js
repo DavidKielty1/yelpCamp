@@ -14,6 +14,7 @@ const Campground = require("./models/campground");
 const methodOverride = require("method-override");
 const Review = require("./models/review");
 const session = require("express-session");
+const MongoDBStore = require("connect-mongo");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -23,10 +24,11 @@ const mongoSanitize = require("express-mongo-sanitize");
 const userRoutes = require("./Routes/users");
 const campgroundRoutes = require("./Routes/campgrounds");
 const reviewRoutes = require("./Routes/reviews");
-// const dbUrl = process.env.DB_URL;
-
+const MongoStore = require("connect-mongo");
+// const dbUrl = "mongodb://localhost:27017/yelp-camp";
+const dbUrl = process.env.DB_URL;
 // "mongodb://localhost:27017/yelp-camp"
-mongoose.connect("mongodb://localhost:27017/yelp-camp", {
+mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
@@ -50,7 +52,21 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(mongoSanitize());
 
+const store = MongoDBStore.create({
+  mongoUrl: dbUrl,
+  secret: "thisisnotagoodsecret",
+  touchAfter: 24 * 60 * 60,
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
+
 const sessionConfig = {
+  // store: MongoDBStore.create({
+  //   mongoUrl: dbUrl,
+  // }),
+  store,
   name: "session",
   secret: "thisisnotagoodsecret",
   resave: false,
@@ -64,6 +80,23 @@ const sessionConfig = {
 };
 
 app.use(session(sessionConfig));
+// app.use(
+//   session({
+//     name: "session",
+//     secret: "thisisnotagoodsecret",
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//       httpOnly: true,
+//       // secure: true,
+//       expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+//       maxAge: 1000 * 60 * 60 * 24 * 7,
+//       store: MongoDBStore.create({
+//         mongoUrl: process.env.DB_URL,
+//       }),
+//     },
+//   })
+// );
 app.use(flash());
 app.use(helmet({ contentSecurityPolicy: false }));
 
