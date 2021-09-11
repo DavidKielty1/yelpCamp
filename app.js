@@ -26,8 +26,8 @@ const campgroundRoutes = require("./Routes/campgrounds");
 const reviewRoutes = require("./Routes/reviews");
 const MongoStore = require("connect-mongo");
 // const dbUrl = "mongodb://localhost:27017/yelp-camp";
-const dbUrl = process.env.DB_URL;
-// "mongodb://localhost:27017/yelp-camp" sdfd
+const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/yelp-camp";
+
 mongoose.connect(dbUrl, {
   useNewUrlParser: true,
   useCreateIndex: true,
@@ -52,9 +52,11 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(mongoSanitize());
 
+const secret = process.env.SECRET || "thisisnotagoodsecret";
+
 const store = MongoDBStore.create({
   mongoUrl: dbUrl,
-  secret: "thisisnotagoodsecret",
+  secret,
   touchAfter: 24 * 60 * 60,
 });
 
@@ -68,7 +70,7 @@ const sessionConfig = {
   // }),
   store,
   name: "session",
-  secret: "thisisnotagoodsecret",
+  secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -98,51 +100,52 @@ app.use(session(sessionConfig));
 //   })
 // );
 app.use(flash());
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet());
 
-// const scriptSrcUrls = [
-//   "https://stackpath.bootstrapcdn.com/",
-//   "https://api.tiles.mapbox.com/",
-//   "https://api.mapbox.com/",
-//   "https://kit.fontawesome.com/",
-//   "https://cdnjs.cloudflare.com/",
-//   "https://cdn.jsdelivr.net",
-// ];
-// const styleSrcUrls = [
-//   "https://kit-free.fontawesome.com/",
-//   "https://stackpath.bootstrapcdn.com/",
-//   "https://api.mapbox.com/",
-//   "https://api.tiles.mapbox.com/",
-//   "https://fonts.googleapis.com/",
-//   "https://use.fontawesome.com/",
-// ];
-// const connectSrcUrls = [
-//   "https://api.mapbox.com/",
-//   "https://a.tiles.mapbox.com/",
-//   "https://b.tiles.mapbox.com/",
-//   "https://events.mapbox.com/",
-// ];
-// const fontSrcUrls = [];
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     directives: {
-//       defaultSrc: [],
-//       connectSrc: ["'self'", ...connectSrcUrls],
-//       scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-//       styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-//       workerSrc: ["'self'", "blob:"],
-//       objectSrc: [],
-//       imgSrc: [
-//         "'self'",
-//         "blob:",
-//         "data:",
-//         "https://res.cloudinary.com/dg0it3ba2/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT!
-//         "https://images.unsplash.com/",
-//       ],
-//       fontSrc: ["'self'", ...fontSrcUrls],
-//     },
-//   })
-// );
+const scriptSrcUrls = [
+  "https://stackpath.bootstrapcdn.com/",
+  "https://api.tiles.mapbox.com/",
+  "https://api.mapbox.com/",
+  "https://kit.fontawesome.com/",
+  "https://cdnjs.cloudflare.com/",
+  "https://cdn.jsdelivr.net",
+];
+const styleSrcUrls = [
+  "https://kit-free.fontawesome.com/",
+  "https://stackpath.bootstrapcdn.com/",
+  "https://api.mapbox.com/",
+  "https://api.tiles.mapbox.com/",
+  "https://fonts.googleapis.com/",
+  "https://use.fontawesome.com/",
+  "https://cdn.jsdelivr.net",
+];
+const connectSrcUrls = [
+  "https://api.mapbox.com/",
+  "https://a.tiles.mapbox.com/",
+  "https://b.tiles.mapbox.com/",
+  "https://events.mapbox.com/",
+];
+const fontSrcUrls = [];
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: [],
+      connectSrc: ["'self'", ...connectSrcUrls],
+      scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+      styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+      workerSrc: ["'self'", "blob:"],
+      objectSrc: [],
+      imgSrc: [
+        "'self'",
+        "blob:",
+        "data:",
+        "https://res.cloudinary.com/dg0it3ba2/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT!
+        "https://images.unsplash.com/",
+      ],
+      fontSrc: ["'self'", ...fontSrcUrls],
+    },
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -176,6 +179,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error", { err });
 });
 
-app.listen(3000, () => {
-  console.log("Serving on port 3000");
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Serving on port ${port}`);
 });
