@@ -21,9 +21,9 @@ const LocalStrategy = require("passport-local");
 const User = require("./models/user");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
-const userRoutes = require("./routes/users");
-const campgroundRoutes = require("./routes/campgrounds");
-const reviewRoutes = require("./routes/reviews");
+const userroutes = require("./routes/users");
+const campgroundroutes = require("./routes/campgrounds");
+const reviewroutes = require("./routes/reviews");
 const MongoStore = require("connect-mongo");
 // const dbUrl = "mongodb://localhost:27017/yelp-camp";//
 const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/yelp-camp";
@@ -145,9 +145,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/", userRoutes);
-app.use("/campgrounds", campgroundRoutes);
-app.use("/campgrounds/:id/reviews", reviewRoutes);
+app.use("/", userroutes);
+app.use("/campgrounds", campgroundroutes);
+app.use("/campgrounds/:id/reviews", reviewroutes);
 
 app.get("/", (req, res) => {
   res.render("campgrounds/home");
