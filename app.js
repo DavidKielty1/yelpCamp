@@ -22,8 +22,8 @@ const User = require("./models/user");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 // const userRoutes = require("./routes/users");
-const userRoutes = require(path.join(__dirname, "./routes/users.js"));
-// const userRoutes = require(path.resolve(__dirname, "./routes/users.js"));
+// const userRoutes = require(path.join(__dirname, "./routes/users.js"));
+const userRoutes = require(path.resolve(__dirname, "./routes/users.js"));
 const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
 const MongoStore = require("connect-mongo");
@@ -52,7 +52,11 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(mongoSanitize());
+app.use(
+  mongoSanitize({
+    replaceWith: "_",
+  })
+);
 
 const secret = process.env.SECRET || "thisisnotagoodsecret";
 
@@ -67,9 +71,6 @@ store.on("error", function (e) {
 });
 
 const sessionConfig = {
-  // store: MongoDBStore.create({
-  //   mongoUrl: dbUrl,
-  // }),
   store,
   name: "session",
   secret,
@@ -84,23 +85,6 @@ const sessionConfig = {
 };
 
 app.use(session(sessionConfig));
-// app.use(
-//   session({
-//     name: "session",
-//     secret: "thisisnotagoodsecret",
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: {
-//       httpOnly: true,
-//       // secure: true,
-//       expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-//       maxAge: 1000 * 60 * 60 * 24 * 7,
-//       store: MongoDBStore.create({
-//         mongoUrl: process.env.DB_URL,
-//       }),
-//     },
-//   })
-// );
 app.use(flash());
 app.use(helmet());
 
